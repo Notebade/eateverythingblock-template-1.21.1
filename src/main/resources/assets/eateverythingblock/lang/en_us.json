@@ -1,0 +1,13 @@
+{
+  "itemGroup.eateverythingblock": "Example Mod Tab",
+  "block.eateverythingblock.example_block": "Example Block",
+  "item.eateverythingblock.example_item": "Example Item",
+
+  "eateverythingblock.configuration.title": "eat everything block Configs",
+  "eateverythingblock.configuration.section.eateverythingblock.common.toml": "eat everything block Configs",
+  "eateverythingblock.configuration.section.eateverythingblock.common.toml.title": "eat everything block Configs",
+  "eateverythingblock.configuration.items": "Item List",
+  "eateverythingblock.configuration.logDirtBlock": "Log Dirt Block",
+  "eateverythingblock.configuration.magicNumberIntroduction": "Magic Number Text",
+  "eateverythingblock.configuration.magicNumber": "Magic Number"
+}
