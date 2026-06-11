@@ -111,12 +111,13 @@ public record EatItemPacket() implements CustomPacketPayload {
         float saturation = 0.0f;
         List<MobEffectInstance> effects = new ArrayList<>();
         // 3. Уменьшаем стак и проигрываем звук
-        stack.shrink(1);
+
         playEatSound(player);
 
         if (stack.is(net.minecraft.world.item.Items.BEDROCK)) {
             // Убиваем игрока с огромным уроном
             player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Ты попытался съесть бедрок... Это была плохая идея."));
+            stack.shrink(1);
             player.hurt(player.damageSources().genericKill(), Float.MAX_VALUE);
             return; // Выходим, чтобы не применять другие эффекты
         }
@@ -167,6 +168,7 @@ public record EatItemPacket() implements CustomPacketPayload {
         for (MobEffectInstance effect : effects) {
             player.addEffect(effect);
         }
+        stack.shrink(1);
     }
 
     // Вспомогательный метод для проверки руд и слитков (теги NeoForge/Forge)
