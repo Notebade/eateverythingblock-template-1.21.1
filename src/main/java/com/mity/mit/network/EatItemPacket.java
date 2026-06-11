@@ -11,8 +11,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.ArrayList;
@@ -110,57 +109,73 @@ public record EatItemPacket() implements CustomPacketPayload {
         int nutrition = 0;
         float saturation = 0.0f;
         List<MobEffectInstance> effects = new ArrayList<>();
-        // 3. Уменьшаем стак и проигрываем звук
-
         playEatSound(player);
+        if (player.level().random.nextFloat() < 0.01f) {
+            effects.add(new MobEffectInstance(MobEffects.HUNGER, 300, 0)); // 15 секунд голода
+        }
 
         if (stack.is(net.minecraft.world.item.Items.BEDROCK)) {
-            // Убиваем игрока с огромным уроном
             player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Ты попытался съесть бедрок... Это была плохая идея."));
             stack.shrink(1);
             player.hurt(player.damageSources().genericKill(), Float.MAX_VALUE);
-            return; // Выходим, чтобы не применять другие эффекты
+            return;
         }
-
-        // Если это растения, листья, цветы (органика)
         if (stack.is(ItemTags.LEAVES) || stack.is(ItemTags.SAPLINGS) || stack.is(ItemTags.FLOWERS) || stack.is(ItemTags.VILLAGER_PLANTABLE_SEEDS)) {
-            nutrition = 1;
-            saturation = 0.2f;
-            // 10% шанс получить легкое отравление (Голод)
-            if (player.level().random.nextFloat() < 0.1f) {
-                effects.add(new MobEffectInstance(MobEffects.HUNGER, 200, 0)); // 10 секунд
+            nutrition = 3;
+            saturation = 1.0f;
+            if (player.level().random.nextFloat() < 0.8f) {
+                effects.add(new MobEffectInstance(MobEffects.REGENERATION, 400, 0));
             }
         }
-        // Если это дерево (бревна, доски)
         else if (stack.is(ItemTags.LOGS) || stack.is(ItemTags.PLANKS) || stack.is(ItemTags.WOODEN_BUTTONS) || stack.is(ItemTags.WOODEN_DOORS)) {
             nutrition = 1;
-            saturation = 0.0f;
-            effects.add(new MobEffectInstance(MobEffects.HUNGER, 300, 0)); // 15 секунд голода
+            saturation = 0.5f;
         }
-        // Если это земля, песок, гравий
         else if (stack.is(ItemTags.DIRT) || stack.is(ItemTags.SAND)) {
-            nutrition = 0;
-            saturation = 0.0f;
-            effects.add(new MobEffectInstance(MobEffects.HUNGER, 400, 0)); // 20 секунд сильного голода
+            nutrition = 1;
+            saturation = 0.2f;
         }
         // Если это руды, слитки, драгоценные камни (металлы и минералы)
         else if (stack.is(ItemTags.COALS) || isOreOrIngot(stack)) {
-            nutrition = 0;
-            saturation = 0.0f;
-            effects.add(new MobEffectInstance(MobEffects.POISON, 100, 0));  // 5 секунд яда
+            nutrition = 4;
+            saturation = 1.2f;
         }
         // Если это просто какой-то блок (например, стекло, шерсть, камень)
         else if (stack.getItem() instanceof BlockItem) {
             nutrition = 1;
             saturation = 0.1f;
-            effects.add(new MobEffectInstance(MobEffects.HUNGER, 200, 0));
         }
-        // Фоллбэк: любые другие предметы (инструменты, мечи, стрелы и т.д.)
+        else if (stack.getItem() instanceof AxeItem) {
+            nutrition = 1;
+            saturation = 0.3f;
+            if (player.level().random.nextFloat() < 0.1f) {
+                player.hurt(player.damageSources().playerAttack(player), 0.1f);
+            }
+            effects.add(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 3000, 0));
+        }
+        else if (stack.getItem() instanceof PickaxeItem) {
+            if (player.level().random.nextFloat() < 0.1f) {
+                player.hurt(player.damageSources().playerAttack(player), 0.1f);
+            }
+            effects.add(new MobEffectInstance(MobEffects.DIG_SPEED, 2000, 0));
+        }
+        else if (stack.getItem() instanceof ShovelItem) {
+            if (player.level().random.nextFloat() < 0.1f) {
+                player.hurt(player.damageSources().playerAttack(player), 0.1f);
+            }
+        }
+        else if (stack.getItem() instanceof SwordItem) {
+            if (player.level().random.nextFloat() < 0.1f) {
+                player.hurt(player.damageSources().playerAttack(player), 0.1f);
+            }
+            effects.add(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 6000, 0));
+        }
         else {
-            nutrition = 0;
-            saturation = 0.0f;
-            effects.add(new MobEffectInstance(MobEffects.POISON, 150, 0));  // 7.5 секунд яда
-            effects.add(new MobEffectInstance(MobEffects.CONFUSION, 200, 0)); // Тошнота
+            nutrition = 1;
+            saturation = 0.2f;
+            if (player.level().random.nextFloat() < 0.1f) {
+                effects.add(new MobEffectInstance(MobEffects.REGENERATION, 200, 0));
+            }
         }
 
         // 2. Применяем сгенерированные свойства
