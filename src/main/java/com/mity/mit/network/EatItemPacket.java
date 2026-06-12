@@ -110,7 +110,7 @@ public record EatItemPacket() implements CustomPacketPayload {
         float saturation = 0.0f;
         List<MobEffectInstance> effects = new ArrayList<>();
         playEatSound(player);
-        if (player.level().random.nextFloat() < 0.01f) {
+        if (player.level().random.nextFloat() < 0.05f) {
             effects.add(new MobEffectInstance(MobEffects.HUNGER, 300, 0)); // 15 секунд голода
         }
 
@@ -120,7 +120,14 @@ public record EatItemPacket() implements CustomPacketPayload {
             player.hurt(player.damageSources().genericKill(), Float.MAX_VALUE);
             return;
         }
-        if (stack.is(ItemTags.LEAVES) || stack.is(ItemTags.SAPLINGS) || stack.is(ItemTags.FLOWERS) || stack.is(ItemTags.VILLAGER_PLANTABLE_SEEDS)) {
+        if (
+                stack.is(ItemTags.LEAVES)
+                        || stack.is(ItemTags.SAPLINGS)
+                        || stack.is(ItemTags.FLOWERS)
+                        || stack.is(ItemTags.VILLAGER_PLANTABLE_SEEDS)
+                        || stack.is(ItemTags.SMALL_FLOWERS)
+                        || stack.is(ItemTags.TALL_FLOWERS)
+        ) {
             nutrition = 3;
             saturation = 1.0f;
             if (player.level().random.nextFloat() < 0.8f) {
@@ -157,7 +164,7 @@ public record EatItemPacket() implements CustomPacketPayload {
             if (player.level().random.nextFloat() < 0.1f) {
                 player.hurt(player.damageSources().playerAttack(player), 0.1f);
             }
-            effects.add(new MobEffectInstance(MobEffects.DIG_SPEED, 2000, 0));
+            effects.add(new MobEffectInstance(MobEffects.DIG_SPEED, 2000, 2));
         }
         else if (stack.getItem() instanceof ShovelItem) {
             if (player.level().random.nextFloat() < 0.1f) {
@@ -168,7 +175,7 @@ public record EatItemPacket() implements CustomPacketPayload {
             if (player.level().random.nextFloat() < 0.1f) {
                 player.hurt(player.damageSources().playerAttack(player), 0.1f);
             }
-            effects.add(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 6000, 0));
+            effects.add(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 6000, 2));
         }
         else {
             nutrition = 1;
