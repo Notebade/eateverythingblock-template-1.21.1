@@ -1,7 +1,3 @@
-from pathlib import Path
-
-content = r"""# Instant Eat Mod
-
 A Minecraft **NeoForge 1.21.1** mod that allows players to instantly consume the item currently held in their hand using a configurable hotkey.
 
 ## Features
@@ -97,7 +93,3 @@ Recommended options:
 
 Made for Minecraft NeoForge 1.21.1
 """
-
-path = "/mnt/data/README_InstantEat_0.0.01a.md"
-Path(path).write_text(content, encoding="utf-8")
-print(path)
